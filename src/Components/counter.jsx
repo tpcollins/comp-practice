@@ -4,12 +4,21 @@ import React, { Component } from 'react'; // imrc; contains lots of methods you 
 
 class Counter extends Component { // Counter class extends the component class that we imported up top from the React module (which is the react library)
     
-    state = { // State contains all attributes needed for render
-        count: 0, // count and imageUrl are now "rendered attributes"
-        imageUrl: 'https://picsum.photos/200',
-        tags: ['tag1', 'tag2', 'tag3']
-    };
+    // *** DIFFERENCE BETWEEN PROPS AND STATE (BIG NOTE) ***: Props include data we give to a component. For example, we sent an h4 element from the counters module to the -
+    // - counter module using {this.props.children}. State includes data that is local or private to that component. Other components can not access that data. Essentially -
+    // - the attributes in state are like setting private attributes in C#. 
+    // Note: Some components do not have states and all of their data is read in through props
+    // Note: Props are read only. We can not change the value of props
+
+    // *** STATE COMMENTED OUT FOR THE PURPOSE OF REMOVING LOCAL STATE SO COUNTER IS CONTROLLED COMPONENT. NOTES STILL GOOD
+
+    // state = { // State contains all attributes needed for render
+    //     value: this.props.counter.value, // Value is reading in value from parent component Counters
+    //     imageUrl: 'https://picsum.photos/200', // value and imageUrl are now "rendered attributes"
+    //     tags: ['tag1', 'tag2', 'tag3']
+    // };
     // Setting Class and Style attributes are a litte bit different (See span and styles function below)
+
 
     // To style with Bootstrap Commands: className = "bootstrap-command"
     // To style with inline styling style = {{}}
@@ -31,37 +40,34 @@ class Counter extends Component { // Counter class extends the component class t
     // }
     // *** THERE IS A BETTER WAY TO SET THIS UP TO AVOID ALL THE NOISE. SEE handleInc BELOW FOR METHOD + EXPLANATION ***
 
-    handleInc = () =>{ // Method for handling what happens when increment button is clicked (log "increment clicked", increase count, display new count)
-        console.log("Increment Clicked", this); // *** EXPLANATION: Since the arrow function inherits the return keyword rather than rebinding it, instead of creating a -
-                                                // - constructor you can use this syntax ( eventName = () => ) to achieve the same thing
-
-                                                // *** HOW TO ACTUALLY UPDATE COUNT METHOD: We can not use this.state.count++ because React is not aware of how that works. -
-                                                // - we must use a function we inherited from the base class we imported (the react library; imrc. this.setState() )
-        this.setState({count: this.state.count + 1}); // This is just the syntax we must use in jsx. It is essentially the same thing as saying state.count++. We are passing -
-                                                      // - count in as an object so the needed properties can be passed to setState
-    }
+    
 
     render() { 
-        return ( 
+        console.log("props: ", this.props); // Every react comp has a property called props. It will display all of the attributes that we set in the parent component (counters)
+
+        return ( // *** PROPS.CHILDREN EXPLANATION ***: If there are children in the parent element (in this example the h1 tag in the counters component) those childern must be -
+                 // - rendered with {this.props.children} or they will not show up. This would not be an absolute necessity here (since it is only one element we could have just -
+                 // - said {this.props.h1} and gotten the same result), but as children elements become more complex this is the best way to do things.
         <React.Fragment>
+            {this.props.children}
             <span 
                 className="badge m-2" 
                 style={{fontSize: 15, backgroundColor: 'green'}}>
-                    {this.formatCount()}
+                    {(this.formatCount())}
             </span>
 
             <button 
-                onClick={this.handleInc}
+                onClick={() => this.props.onIncrement(this.props.counter)}
                 className="btn btn-pill btn-secondary m-2" 
                 style={this.btnStyle}>
                     Increment
             </button>
-            <br />
-            <img src={this.state.imageUrl} alt="" />
-            <br />
-            <ul>
-                { this.state.tags.map(tag => <li key={tag}> {tag} </li>)}
-            </ul>
+            <button 
+                onClick={() => this.props.onDelete(this.props.counter.id)}
+                className="btn btn-pill btn-secondary m-2 btn-danger" 
+                style={this.btnStyle}>
+                    Delete
+            </button>
         </React.Fragment> // Simple component that, when rendered, will return this the element
         ); // When manipulating the DOM, you will see that having a <div> key word instead of React.Fragment will cause you to have an unused div. Sometimes multiple divs are -
            // - necessary, however, when they are not this can be fixed React.Fragment
@@ -76,8 +82,8 @@ class Counter extends Component { // Counter class extends the component class t
     }
 
     formatCount() {
-        const { count } = this.state;
-        return count === 0 ? "Zero" : count; // In plain English: If count = 0 return Zero, otherwise return count
+        const { value } = this.props.counter;
+        return value === 0 ? "Zero" : value; // In plain English: If count = 0 return Zero, otherwise return count
     }
 }
  
